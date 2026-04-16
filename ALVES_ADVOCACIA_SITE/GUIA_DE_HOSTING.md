@@ -16,7 +16,7 @@ Este pacote contém a versão final e otimizada (V8.1) do portal da Alves Advoca
 1. **Servidor:** Suba todos os arquivos para a pasta principal do seu servidor (ex: `/public_html`).
 2. **Acesso Admin:** Acesse `seudominio.com.br/admin.html`.
 3. **Ativação:** 
-   - Senha: `alves2026`
+   - Senha: `SENHA`
    - Insira sua **OpenAI API Key** para habilitar o robô.
 
 ---
