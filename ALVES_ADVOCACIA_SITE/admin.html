@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Alves Advocacia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c5a059;
+            --bg: #0a0e14;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        body {
+            background: var(--bg);
+            color: #e0e6ed;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .admin-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 3rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            color: var(--gold);
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gold);
+            color: black;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: transform 0.2s;
+        }
+        .btn:hover { transform: scale(1.02); }
+        #auth-section { display: block; }
+        #config-section { display: none; }
+        .success-msg { color: #00ffa3; font-size: 0.85rem; margin-top: 0.5rem; display: none; }
+    </style>
+</head>
+<body>
+    <div class="admin-card">
+        <h1>Painel Estratégico AI</h1>
+        
+        <!-- SEÇÃO DE LOGIN -->
+        <div id="auth-section">
+            <div class="form-group">
+                <label>Senha de Acesso</label>
+                <input type="password" id="admin-pass" placeholder="••••••••">
+            </div>
+            <button class="btn" onclick="checkAuth()">Entrar no Painel</button>
+            <p id="error-msg" style="color: #ff4d4d; font-size: 0.85rem; margin-top: 1rem; text-align: center; display: none;">Senha incorreta. Tente novamente.</p>
+        </div>
+
+        <!-- SEÇÃO DE CONFIGURAÇÃO -->
+        <div id="config-section">
+            <div class="form-group">
+                <label>OpenAI ChatGPT API Key (GPT-4o mini)</label>
+                <input type="password" id="openai-key" placeholder="sk-proj-...">
+                <p style="font-size: 0.75rem; color: #64748b; margin-top: 5px;">Gere sua chave em: <a href="https://platform.openai.com/api-keys" target="_blank" style="color: var(--gold);">platform.openai.com</a></p>
+            </div>
+            <div class="form-group">
+                <label>WhatsApp de Conversão</label>
+                <input type="text" id="phone-lead" placeholder="Ex: 5511998274209">
+            </div>
+            <button class="btn" onclick="saveConfig()">Salvar Configurações</button>
+            <p class="success-msg" id="save-msg">✓ Configurações salvas com sucesso!</p>
+            <button class="btn" style="background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; margin-top: 2rem;" onclick="logout()">Sair</button>
+        </div>
+    </div>
+
+    <script>
+        // SENHA PADRÃO: alves2026
+        const SECRET = "alves2026";
+
+        function checkAuth() {
+            const pass = document.getElementById('admin-pass').value;
+            if(pass === SECRET) {
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('config-section').style.display = 'block';
+                loadConfig();
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
+            }
+        }
+
+        function saveConfig() {
+            const key = document.getElementById('openai-key').value;
+            const phone = document.getElementById('phone-lead').value;
+            
+            localStorage.setItem('ALVES_OPENAI_KEY', key);
+            localStorage.setItem('ALVES_LEAD_PHONE', phone);
+            
+            const msg = document.getElementById('save-msg');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        }
+
+        function loadConfig() {
+            document.getElementById('openai-key').value = localStorage.getItem('ALVES_OPENAI_KEY') || localStorage.getItem('ALVES_GEMINI_KEY') || "";
+            document.getElementById('phone-lead').value = localStorage.getItem('ALVES_LEAD_PHONE') || "5511998274209";
+        }
+
+        function logout() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>

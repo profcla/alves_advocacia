@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Rental - Alves Advocacia</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Bibliotecas para Documentos e Exportação -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="background-glow"></div>
+    
+    <header class="top-nav">
+        <a href="index.html" class="logo" style="text-decoration: none;">
+            <img src="logo_alves.png" alt="Alves Advocacia" class="office-logo">
+            <div class="logo-text">
+                <strong class="brand-highlight">Alves Advocacia</strong>
+                <span>Simulador Rental • Estratégico</span>
+            </div>
+        </a>
+        <button id="exportPdfBtn" class="download-btn">📄 Baixar Relatório PDF</button>
+    </header>
+
+    <main class="app-container" id="capture-area">
+        <header class="hero">
+            <div class="badge">Estratégia Tributária</div>
+            <h1>Simulador <span class="gradient-text">Rental</span></h1>
+            <p>Análise de impacto IBS/CBS para locadoras de equipamentos.</p>
+        </header>
+
+        <section class="simulator-card glass">
+            <div class="card-header">
+                <h2>1. Simulador de Regimes</h2>
+                <span class="status-dot"></span>
+            </div>
+            
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="faturamento">Faturamento Locação (Mensal)</label>
+                    <input type="number" id="faturamento" placeholder="0,00" value="100000">
+                </div>
+                <div class="input-group">
+                    <label for="venda">Faturamento Venda (Mensal)</label>
+                    <input type="number" id="venda" placeholder="0,00" value="0">
+                </div>
+                <div class="input-group">
+                    <label for="cbs-rate">Alíquota CBS (%) <small>(União)</small></label>
+                    <input type="number" id="cbs-rate" step="0.1" value="8.8">
+                </div>
+                <div class="input-group">
+                    <label for="ibs-rate">Alíquota IBS (%) <small>(Estado/Mun)</small></label>
+                    <input type="number" id="ibs-rate" step="0.1" value="17.7">
+                </div>
+                <div class="input-group">
+                    <label for="margem">Margem Operacional (%)</label>
+                    <div class="range-container">
+                        <input type="range" id="margem" min="10" max="60" value="35">
+                        <span id="margem-val">35%</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="compras">Compras/Insumos (estimado)</label>
+                    <input type="text" id="compras-display" readonly value="R$ 65.000,00">
+                </div>
+            </div>
+
+            <div class="results-grid" id="results">
+                <!-- Regimes will be injected here -->
+                <div class="regime-card" data-regime="puro">
+                    <h3>Simples Nacional (Puro)</h3>
+                    <div class="tax-value" id="tax-puro">R$ 0,00</div>
+                    <p class="benefit">Fornecedor: Cumulativo (Sem créditos)</p>
+                    <p class="benefit">Cliente: Crédito Restrito (DAS)</p>
+                </div>
+                <div class="regime-card highlighted" data-regime="hibrido">
+                    <h3>Simples Nacional (Híbrido)</h3>
+                    <div class="tax-value" id="tax-hibrido">R$ 0,00</div>
+                    <p class="benefit">Fornecedor: Não-cumulativo (Com créditos)</p>
+                    <p class="benefit">Cliente: Crédito Integral (26,5%)</p>
+                </div>
+                <div class="regime-card" data-regime="presumido">
+                    <h3>Lucro Presumido</h3>
+                    <div class="tax-value" id="tax-presumido">R$ 0,00</div>
+                    <p class="benefit">IBS/CBS Não-cumulativos</p>
+                </div>
+                <div class="regime-card" data-regime="real">
+                    <h3>Lucro Real</h3>
+                    <div class="tax-value" id="tax-real">R$ 0,00</div>
+                    <p class="benefit">Não-cumulativo Integral</p>
+                </div>
+            </div>
+
+            <div class="chart-container glass-dark">
+                <canvas id="comparisonChart"></canvas>
+            </div>
+        </section>
+
+        <section class="analyzer-card glass">
+            <div class="card-header">
+                <h2>2. Analisador de Cláusulas</h2>
+                <div class="ai-badge">AI Auditor</div>
+            </div>
+            <p>Cole as cláusulas de tributos ou preços do seu contrato para identificar riscos.</p>
+            
+            <div class="analyzer-input">
+                <div class="file-upload-container">
+                    <label for="fileInput" class="secondary-btn">📂 Carregar PDF ou Word (.docx)</label>
+                    <input type="file" id="fileInput" accept=".pdf,.docx,.doc" style="display: none;">
+                    <span id="fileName" class="file-name">Nenhum arquivo selecionado</span>
+                    <button id="clearBtn" class="secondary-btn" style="margin-left: 10px; padding: 5px 15px; font-size: 0.8rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(0, 229, 255, 0.3); color: #00e5ff; border-radius: 6px; cursor: pointer; transition: all 0.3s ease;">Limpar</button>
+                </div>
+                <textarea id="contractText" placeholder="Ex: 'O preço total inclui todos os impostos devidos...'"></textarea>
+                <button id="analyzeBtn" class="primary-btn">Analisar Impacto</button>
+            </div>
+
+            <div id="analyzerResults" class="analyzer-results hidden">
+                <h3>Resultado da Auditoria</h3>
+                <div class="risk-list" id="riskList">
+                    <!-- Risks injected here -->
+                </div>
+            </div>
+        </section>
+
+        <section class="breakdown-card glass">
+            <div class="card-header">
+                <h2>3. Memória de Cálculo</h2>
+                <div class="ai-badge">Transparência</div>
+            </div>
+            
+            <div class="company-input-group">
+                <label for="companyName">Nome da Empresa para o Relatório:</label>
+                <input type="text" id="companyName" placeholder="Digite o nome da sua empresa..." value="Sua Empresa Locadora">
+            </div>
+
+            <div id="detailed-breakdown" class="breakdown-grid">
+                <p class="placeholder-text">Aguardando dados para detalhamento...</p>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>&copy; 2026 <span class="brand-highlight">Alves Advocacia</span>. Dados baseados na LC 214/2025.</p>
+            <a href="admin.html" style="opacity: 0.05; font-size: 0.7rem; text-decoration: none; color: inherit; display: inline-block; margin-top: 5px;">Admin</a>
+        </footer>
+    </main>
+
+    <!-- TEMPLATE OCULTO PARA O PDF (TEMA CLARO) -->
+    <div id="pdf-template" class="pdf-only" style="display: none;">
+        <div class="report-header">
+            <img src="logo_alves.png" alt="Logo" class="pdf-logo">
+            <div class="report-title">
+                <h1 id="pdf-company-title">RELATÓRIO DE IMPACTO: SIMULADOR RENTAL</h1>
+                <p>Alves Advocacia - Consultoria Estratégica</p>
+            </div>
+            <div class="report-date" id="pdf-date">Data: --/--/----</div>
+        </div>
+
+        <div class="report-section">
+            <h2>1. Resumo Executivo</h2>
+            <div id="pdf-summary" class="summary-box">
+                <!-- Conteúdo dinâmico -->
+            </div>
+        </div>
+
+        <div class="report-section">
+            <h2>2. Comparativo de Regimes</h2>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Regime</th>
+                        <th>Carga Mensal</th>
+                        <th>Alíquota Efetiva</th>
+                        <th>Crédito Cliente</th>
+                    </tr>
+                </thead>
+                <tbody id="pdf-table-body">
+                    <!-- Linhas dinâmicas -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="report-section chart-section">
+            <h2>3. Visualização de Impacto</h2>
+            <div class="pdf-chart-container">
+                <img id="pdf-chart-img" style="width: 100%; max-height: 300px;">
+            </div>
+        </div>
+
+        <div class="report-section">
+            <h2>4. Auditoria de Riscos (Contrato)</h2>
+            <div id="pdf-risks" class="pdf-risk-list">
+                <!-- Riscos dinâmicos -->
+            </div>
+        </div>
+
+        <div class="report-footer">
+            <p>Este relatório é uma simulação baseada na LC 214/25 e nas diretrizes vigentes. Recomenda-se validação jurídica e contábil.</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="tax-ai.js?v=8.1"></script>
+</body>
+</html>
